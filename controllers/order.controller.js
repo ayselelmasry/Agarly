@@ -27,6 +27,7 @@ exports.checkoutOrder = asyncHandler(async (req, res, next) => {
         Customer,
         Product,
         orderDate,
+        numOfDays,
         returnDate,
         totalAmount 
     });
