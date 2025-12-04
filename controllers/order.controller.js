@@ -34,4 +34,4 @@ exports.checkoutOrder = asyncHandler(async (req, res, next) => {
     res.status(201).json({ status: "success", message: 'order created successfully', data: order });
 });
 
-exports.getAllOrders = factory.getAll(Order, ['user', 'product']);
+exports.getAllOrders = factory.getAll(Order, ['Customer', 'Product']);

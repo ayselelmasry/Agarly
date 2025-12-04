@@ -61,7 +61,7 @@ exports.getOne = (model, populateOptions) =>
     res.status(200).json({status: 'success', message: `document reterived successfully`, data: document });
   });
 
-exports.getAll = (model) =>
+exports.getAll = (model, populateOptions) =>
   asyncHandler(async (req, res) => {
     let filter = {};
     if (req.filterObj) {
@@ -74,11 +74,17 @@ exports.getAll = (model) =>
       .search("Products")
       .sort()
       .limitFields()
-      .paginate(documentCount);
+      .paginate(documentCount)
+      .populate(populateOptions);
     const { mongooseQuery, paginationResult } = apiFeatures;
     // Execute Query
     const documents = await mongooseQuery;
     res
       .status(200)
-      .json({ status: 'success', paginationResult, results: documents.length, data: documents });
+      .json({
+        status: "success",
+        paginationResult,
+        results: documents.length,
+        data: documents,
+      });
   });
