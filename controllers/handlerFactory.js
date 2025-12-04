@@ -74,9 +74,16 @@ exports.getAll = (model, populateOptions) =>
       .search("Products")
       .sort()
       .limitFields()
-      .paginate(documentCount)
-      .populate(populateOptions);
+      .paginate(documentCount);
     const { mongooseQuery, paginationResult } = apiFeatures;
+
+
+        if (populateOptions) {
+          populateOptions.forEach(
+            (opt) => (mongooseQuery = mongooseQuery.populate(opt))
+          );
+    }
+    
     // Execute Query
     const documents = await mongooseQuery;
     res
