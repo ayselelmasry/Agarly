@@ -75,14 +75,13 @@ exports.getAll = (model, populateOptions) =>
       .sort()
       .limitFields()
       .paginate(documentCount);
-    const { mongooseQuery, paginationResult } = apiFeatures;
+    let { mongooseQuery, paginationResult } = apiFeatures;
 
-
-        if (populateOptions) {
-          populateOptions.forEach(
-            (opt) => (mongooseQuery = mongooseQuery.populate(opt))
-          );
-    }
+if (populateOptions) {
+  populateOptions.forEach((opt) => {
+    mongooseQuery.populate(opt);
+  });
+}
     
     // Execute Query
     const documents = await mongooseQuery;
