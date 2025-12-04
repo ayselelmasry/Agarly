@@ -34,13 +34,13 @@ exports.updateOne = (model) =>
     // trigger "save" event when update review
     document.save();
 
-    res.status(200).json({ status: 'success', message: `${model} updated successfully`, data: document });
+    res.status(200).json({ status: 'success', message: `document updated successfully`, data: document });
   });
 
 exports.createOne = (model) =>
   asyncHandler(async (req, res) => {
     const newDoc = await model.create(req.body);
-    res.status(201).json({status: 'success', message: `${model} created successfully`, data: newDoc });
+    res.status(201).json({status: 'success', message: `document created successfully`, data: newDoc });
   });
 
 exports.getOne = (model, populateOptions) =>
