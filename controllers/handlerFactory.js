@@ -58,7 +58,7 @@ exports.getOne = (model, populateOptions) =>
       // res.status(404).json({ msg: `No category for this id ${id}` });
       return next(new ApiError(`No document for this id ${id}`, 404));
     }
-    res.status(200).json({status: 'success', message: `${model} reterived successfully`, data: document });
+    res.status(200).json({status: 'success', message: `document reterived successfully`, data: document });
   });
 
 exports.getAll = (model) =>

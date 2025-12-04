@@ -26,8 +26,9 @@ const userSchema = new mongoose.Schema(
     profileImage: {
       type: String,
     },
+    joinDate: Date,
     address: addressSchema,
-    birthday: Date,
+    birthDay: Date,
     phone: String,
     role: {
       type: String,
