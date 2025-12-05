@@ -65,6 +65,8 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
 
   req.body.images = [];
 
+  if (!req.files.images) return next();
+
   await Promise.all(
     req.files.images.map(async (file) => {
       const filename = `product-${uuidv4()}-${Date.now()}.jpeg`;

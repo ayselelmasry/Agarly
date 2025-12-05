@@ -20,7 +20,7 @@ router
 router
   .route("/:id")
   .get(controller.getClothe)
-  .patch(
+  .put(
     authController.protect,
     authController.allowedTo("Manager", "Admin", "Agent"),
     imageController.uploadProductImage,
