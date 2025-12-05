@@ -8,7 +8,7 @@ const { protect, allowedTo } = require('../controllers/auth.controller');
 router.use(protect);
 router.post(
     "/checkAvailability",
-    allowedTo("Agent", "Admin"),
+    allowedTo("Agent", "Admin", "User"),
     checkAvailability
 );
 router.post(

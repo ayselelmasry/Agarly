@@ -19,14 +19,17 @@ exports.checkAvailability = asyncHandler(async (req, res, next) => {
         return next(new ApiError("Product not found", 404));
     }
 
-    const availability = await Availability.findOne({ Product: productId });
-    if (!availability) {
-        return next(new ApiError("Availability information not found for this product", 404));
-    }
+    let availability = await Availability.findOne({ Product: productId });
+  if (!availability) {
+    availability = await Availability.create({
+      Product: productId,
+      unavailableDates: [], // ensure the field exists and is an array
+    });
+  }
 
-    const start = new Date(startDate).split('T')[0];
-    const end = new Date(endDate).split('T')[0];
-    if (start >= end) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (start > end) {
         return next(new ApiError("End date must be after start date", 400));
     }
 
@@ -38,12 +41,13 @@ exports.checkAvailability = asyncHandler(async (req, res, next) => {
 
     // Check for overlap with unavailable dates
     const isUnavailable = await Availability.exists({
-    product: productId,
+    Product: productId,
     unavailableDates: { $in: requestedDates },
     });
 
+
     if (isUnavailable) {
-        return next(new ApiError("Product is not available for the selected dates", 400));
+        return next(new ApiError("Product is not available for the selected dates", 404));
     }
 
     res.status(200).json({
@@ -69,7 +73,7 @@ exports.addUnavailableDates = asyncHandler(async (req, res, next) => {
 
     let availability = await Availability.findOne({ Product: productId });
     if (!availability) {
-        availability = new Availability({ Product: productId });
+        availability =  await Availability.create({ Product: productId });
     }
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -83,17 +87,18 @@ exports.addUnavailableDates = asyncHandler(async (req, res, next) => {
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
         newUnavailableDates.push(new Date(d));
     }
+    console.log(newUnavailableDates);
 
-    await Availability.findOneAndUpdate(
-    { product: productId },
-    { $addToSet: { unavailableDates: { $each: newUnavailableDates } } },
-    { upsert: true, new: true }
+    const avail2 = await Availability.findOneAndUpdate(
+    { Product: productId },
+    { $addToSet: { unavailableDates: { $each: newUnavailableDates} } },
+    {upsert:true,  new: true }
     );
 
     res.status(200).json({
-        status: "success",
-        message: "Unavailable dates added successfully",
-        unavailableDates: availability.unavailableDates,
+      status: "success",
+      message: "Unavailable dates added successfully",
+      unavailableDates: avail2.unavailableDates,
     });
 })
 
@@ -112,22 +117,26 @@ exports.removeUnavailableDate = asyncHandler(async (req, res, next) => {
         return next(new ApiError("Product not found", 404));
     }
 
+    
+
     const availability = await Availability.findOne({ Product: productId });
     if (!availability) {
-        availability = new Availability({ Product: productId });
+        availability = await Availability.create({ Product: productId });
     }
-    const targetDate = new Date(date).toISOString().split('T')[0];
+    const targetDate = new Date(date);
+
+
 
 // Remove the date from unavailableDates
-    await Availability.findOneAndUpdate(
-        { product: productId },
-        { $pull: { unavailableDates: { $eq: new Date(targetDate) } } },
-        { new: true }
+    const avail2 = await Availability.findOneAndUpdate(
+        { Product: productId },
+        { $pull: { unavailableDates: { $eq: targetDate } } },
+        {upsert:true, new: true }
     );
     
     res.status(200).json({
         status: "success",
         message: "Unavailable date removed successfully",
-        unavailableDates: availability.unavailableDates,
+        unavailableDates: avail2.unavailableDates,
     });
 });
